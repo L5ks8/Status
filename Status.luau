@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 
 local existing = nil
 pcall(function()
@@ -73,6 +74,22 @@ end)
 
 local bg_color = Color3.fromRGB(31, 33, 35)
 
+local posFile = "statusposition.json"
+local defaultPos = UDim2.new(1, -12, 0, 10)
+local savedPos = defaultPos
+
+pcall(function()
+    if isfile and readfile and isfile(posFile) then
+        local content = readfile(posFile)
+        if content and content ~= "" then
+            local data = HttpService:JSONDecode(content)
+            if data and data.XScale and data.XOffset and data.YScale and data.YOffset then
+                savedPos = UDim2.new(data.XScale, data.XOffset, data.YScale, data.YOffset)
+            end
+        end
+    end
+end)
+
 local okFont, chosenFont = pcall(function()
     return Enum.Font.BuilderSansMedium
 end)
@@ -84,7 +101,7 @@ Main.AnchorPoint = Vector2.new(1, 0)
 Main.BackgroundColor3 = Color3.new(0.122, 0.129, 0.137)
 Main.BorderColor3 = Color3.new(0, 0, 0)
 Main.BorderSizePixel = 0
-Main.Position = UDim2.new(1, -12, 0, 10)
+Main.Position = (Config and Config.Position) or savedPos
 Main.Size = UDim2.new(0, 160, 0, 36)
 Main.ClipsDescendants = false
 Main.Parent = Status
@@ -116,6 +133,20 @@ local function updateDrag(input)
     Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 end
 
+local function savePosition()
+    pcall(function()
+        if writefile then
+            local data = {
+                XScale = Main.Position.X.Scale,
+                XOffset = Main.Position.X.Offset,
+                YScale = Main.Position.Y.Scale,
+                YOffset = Main.Position.Y.Offset
+            }
+            writefile(posFile, HttpService:JSONEncode(data))
+        end
+    end)
+end
+
 local function enableDrag(frame)
     frame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -126,6 +157,7 @@ local function enableDrag(frame)
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
+                    savePosition()
                 end
             end)
         end
@@ -414,5 +446,4 @@ do
 end
 
 return Status
-
 
