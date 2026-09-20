@@ -24,6 +24,7 @@ local Status = Instance.new("ScreenGui")
 Status.Name = "Status"
 Status.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 Status.ResetOnSpawn = false
+Status.IgnoreGuiInset = true
 
 if gethui then
     Status.Parent = gethui()
@@ -51,11 +52,12 @@ local defaultFont = okFont and chosenFont or Enum.Font.GothamMedium
 
 local Main = Instance.new("Frame")
 Main.Name = "Main"
+Main.AnchorPoint = Vector2.new(1, 0)
 Main.BackgroundColor3 = Color3.new(0.122, 0.129, 0.137)
 Main.BorderColor3 = Color3.new(0, 0, 0)
 Main.BorderSizePixel = 0
-Main.Position = UDim2.new(0.116, 0, 0.011, 0)
-Main.Size = UDim2.new(0, 160, 0, 45)
+Main.Position = UDim2.new(1, -12, 0, 4)
+Main.Size = UDim2.new(0, 160, 0, 36)
 Main.ClipsDescendants = false
 Main.Parent = Status
 
@@ -86,25 +88,28 @@ local function updateDrag(input)
     Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 end
 
-Main.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = Main.Position
+local function enableDrag(frame)
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
 
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+end
 
-Main.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
+enableDrag(Main)
 
 UserInputService.InputChanged:Connect(function(input)
     if input == dragInput and dragging then
@@ -118,10 +123,11 @@ Fps.BackgroundColor3 = Color3.new(1, 1, 1)
 Fps.BackgroundTransparency = 1
 Fps.BorderColor3 = Color3.new(0, 0, 0)
 Fps.BorderSizePixel = 0
-Fps.Size = UDim2.new(0, 45, 0, 45)
+Fps.Size = UDim2.new(0, 45, 1, 0)
 Fps.ClipsDescendants = false
 Fps.AutoButtonColor = false
 Fps.Parent = Main
+enableDrag(Fps)
 
 local FpsCorner = Instance.new("UICorner")
 FpsCorner.BottomLeftRadius = UDim.new(1, 0)
@@ -201,11 +207,12 @@ Ping.BorderColor3 = Color3.new(0, 0, 0)
 Ping.BorderSizePixel = 0
 Ping.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 Ping.LayoutOrder = 1
-Ping.Size = UDim2.new(0, 45, 0, 45)
+Ping.Size = UDim2.new(0, 45, 1, 0)
 Ping.TextColor3 = Color3.new(1, 1, 1)
 Ping.ClipsDescendants = false
 Ping.AutoButtonColor = false
 Ping.Parent = Main
+enableDrag(Ping)
 
 local PingCorner = Instance.new("UICorner")
 PingCorner.BottomLeftRadius = UDim.new(1, 0)
@@ -295,10 +302,11 @@ Memory.BackgroundTransparency = 1
 Memory.BorderColor3 = Color3.new(0, 0, 0)
 Memory.BorderSizePixel = 0
 Memory.LayoutOrder = 2
-Memory.Size = UDim2.new(0, 45, 0, 45)
+Memory.Size = UDim2.new(0, 45, 1, 0)
 Memory.ClipsDescendants = false
 Memory.AutoButtonColor = false
 Memory.Parent = Main
+enableDrag(Memory)
 
 local MemoryCorner = Instance.new("UICorner")
 MemoryCorner.BottomLeftRadius = UDim.new(1, 0)
@@ -374,3 +382,4 @@ do
 end
 
 return Status
+
