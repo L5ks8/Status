@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
+local GuiService = game:GetService("GuiService")
 
 local existing = nil
 pcall(function()
@@ -72,10 +73,10 @@ task.spawn(function()
     end
 end)
 
-local bg_color = Color3.fromRGB(31, 33, 35)
+local bg_color = Color3.fromRGB(22, 22, 24)
 
 local posFile = "statusposition.json"
-local defaultPos = UDim2.new(1, -12, 0, 10)
+local defaultPos = UDim2.new(1, -12, 0, 4)
 local savedPos = defaultPos
 
 pcall(function()
@@ -98,11 +99,12 @@ local defaultFont = okFont and chosenFont or Enum.Font.GothamMedium
 local Main = Instance.new("Frame")
 Main.Name = "Main"
 Main.AnchorPoint = Vector2.new(1, 0)
-Main.BackgroundColor3 = Color3.new(0.122, 0.129, 0.137)
+Main.BackgroundColor3 = bg_color
+Main.BackgroundTransparency = 0
 Main.BorderColor3 = Color3.new(0, 0, 0)
 Main.BorderSizePixel = 0
 Main.Position = (Config and Config.Position) or savedPos
-Main.Size = UDim2.new(0, 160, 0, 36)
+Main.Size = UDim2.new(0, 160, 0, 44)
 Main.ClipsDescendants = false
 Main.Parent = Status
 
