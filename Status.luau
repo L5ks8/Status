@@ -43,6 +43,34 @@ else
     end
 end
 
+local function unlockFps(cap)
+    local target = cap or 1000
+    pcall(function()
+        if setfpscap then
+            setfpscap(target)
+        elseif set_fps_cap then
+            set_fps_cap(target)
+        end
+    end)
+    pcall(function()
+        local userSettings = UserSettings():GetService("UserGameSettings")
+        if userSettings then
+            pcall(function()
+                userSettings.FramerateCap = target
+            end)
+        end
+    end)
+end
+
+unlockFps(1000)
+
+task.spawn(function()
+    while Status and Status.Parent do
+        unlockFps(1000)
+        task.wait(10)
+    end
+end)
+
 local bg_color = Color3.fromRGB(31, 33, 35)
 
 local okFont, chosenFont = pcall(function()
@@ -56,7 +84,7 @@ Main.AnchorPoint = Vector2.new(1, 0)
 Main.BackgroundColor3 = Color3.new(0.122, 0.129, 0.137)
 Main.BorderColor3 = Color3.new(0, 0, 0)
 Main.BorderSizePixel = 0
-Main.Position = UDim2.new(1, -12, 0, 4)
+Main.Position = UDim2.new(1, -12, 0, 10)
 Main.Size = UDim2.new(0, 160, 0, 36)
 Main.ClipsDescendants = false
 Main.Parent = Status
@@ -196,6 +224,10 @@ do
 
     button.MouseLeave:Connect(function()
         tooltipFrame.Visible = false
+    end)
+
+    button.MouseButton1Click:Connect(function()
+        unlockFps(1000)
     end)
 end
 
@@ -382,4 +414,5 @@ do
 end
 
 return Status
+
 
